@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashish Mishra — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Alex+Brush&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#a3273f;
+    --gray:#6f6f6f;
+    --gray-dark:#4d4d4d;
+    --ink:#1c1c1c;
+    --muted:#7a7a7a;
+    --tan:#c8a267;
+    --paper:#ffffff;
+    --stage-w:1450px;
+    --stage-h:820px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:#e9e9e9;
+    font-family:'Poppins',sans-serif;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    overflow:hidden;
+  }
+  #viewport{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .stage{
+    width:var(--stage-w);
+    height:var(--stage-h);
+    background:var(--paper);
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,0.25);
+    flex-shrink:0;
+    transform-origin:center center;
+  }
+
+  /* ---------- decorative dot corners ---------- */
+  .dots{
+    position:absolute;
+    width:190px;
+    height:190px;
+    pointer-events:none;
+    background-image:radial-gradient(circle,#111 1.4px,transparent 1.4px);
+    background-size:15px 15px;
+    z-index:5;
+  }
+  .dots.tr{
+    top:0; right:0;
+    -webkit-mask-image:radial-gradient(circle at 100% 0%, black 0%, black 35%, transparent 72%);
+    mask-image:radial-gradient(circle at 100% 0%, black 0%, black 35%, transparent 72%);
+  }
+  .dots.bl{
+    bottom:0; left:0;
+    -webkit-mask-image:radial-gradient(circle at 0% 100%, black 0%, black 35%, transparent 72%);
+    mask-image:radial-gradient(circle at 0% 100%, black 0%, black 35%, transparent 72%);
+  }
+
+  /* ---------- top nav ---------- */
+  .topnav{
+    position:absolute;
+    top:36px; right:70px;
+    display:flex;
+    gap:46px;
+    z-index:10;
+    font-weight:600;
+    font-size:19px;
+    letter-spacing:.2px;
+  }
+  .topnav a{
+    color:var(--ink);
+    text-decoration:none;
+    cursor:pointer;
+    transition:color .15s ease;
+  }
+  .topnav a.active{ color:var(--red); }
+  .topnav a:hover{ color:var(--red); }
+
+  .brand{
+    position:absolute;
+    top:38px; left:64px;
+    font-size:19px;
+    font-weight:700;
+    color:var(--red);
+    z-index:10;
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .brand span{ font-weight:700; }
+  .brand:hover{ opacity:0.75; }
+
+  /* ---------- swipe hint (replaces the old Back/Next buttons) ---------- */
+  .swipe-hint{
+    position:absolute;
+    bottom:26px; left:0; right:0;
+    text-align:center;
+    z-index:10;
+    font-size:13px;
+    letter-spacing:1.5px;
+    color:var(--muted);
+    opacity:0.55;
+    pointer-events:none;
+    transition:opacity .4s ease;
+  }
+  .swipe-hint.hide{ opacity:0; }
+
+  /* ---------- slides ---------- */
+  .slide{
+    position:absolute;
+    inset:0;
+    display:none;
+    padding:0;
+    transform:translateY(0);
+    will-change:transform;
+  }
+  .slide.active{ display:block; }
+  /* .transitioning is applied only while a page-change animation is running,
+     so normal (non-animated) state changes (e.g. instant first load) are unaffected */
+  .slide.transitioning{ transition:transform .65s cubic-bezier(.65,0,.35,1); }
+
+  /* individual pieces of text/content within a slide fly into place, staggered,
+     layered on top of the whole-section slide so it reads as a single moving page */
+  .fly-in{
+    animation:flyIn .65s cubic-bezier(.22,.75,.15,1.15) both;
+  }
+  @keyframes flyIn{
+    from{ opacity:0; transform:translateY(46px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ===== SLIDE 0 — COVER ===== */
+  #s0 .headline{
+    position:absolute; top:70px; left:60px;
+    font-size:96px; font-weight:800; letter-spacing:1px;
+    color:#0b2e59;
+  }
+  #s0 .subhead{
+    position:absolute; top:220px; left:64px; width:480px;
+    font-size:36px; font-weight:800; letter-spacing:0.5px; line-height:1;
+  }
+  #s0 .subhead div{ margin-bottom:36px; cursor:pointer; transition:transform .2s ease; }
+  #s0 .subhead div:hover{ transform:translateX(4px); }
+  #s0 .subhead .role-gd{ color:#4fc3f7; }
+  #s0 .subhead .role-ui{ color:#ee2a6f; }
+  #s0 .subhead .role-ve{ color:#f4b400; }
+  #s0 .hover-tip{
+    position:absolute; top:500px; left:64px; width:420px;
+    font-size:12px; letter-spacing:1px; color:var(--muted);
+  }
+  #s0 .skills-reveal{
+    position:absolute; top:220px; left:580px; width:430px; height:340px;
+  }
+  #s0 .skill-group{
+    position:absolute; left:0; width:100%;
+    opacity:0; transform:translateX(-18px);
+    transition:opacity .35s ease, transform .35s ease;
+    pointer-events:none;
+  }
+  /* each group's top matches the vertical position of its role line (72px row spacing: 36px text + 36px margin) */
+  #s0 .skill-group[data-role="gd"]{ top:0px; }
+  #s0 .skill-group[data-role="ui"]{ top:72px; }
+  #s0 .skill-group[data-role="ve"]{ top:144px; }
+  #s0 .skill-group.show{ opacity:1; transform:translateX(0); }
+  #s0 .skill-group .item{
+    display:flex; align-items:center; gap:12px;
+    font-size:25px; font-weight:800; letter-spacing:0.5px; line-height:1;
+    margin-bottom:6px; color:var(--ink);
+  }
+  #s0 .skill-group .dot{ width:16px; height:16px; border-radius:50%; flex:0 0 auto; }
+  #s0 .skill-group .dot.cyan{ background:#4fc3f7; }
+  #s0 .skill-group .dot.magenta{ background:#ee2a6f; }
+  #s0 .skill-group .dot.yellow{ background:#f4b400; }
+  #s0 .skill-group .dot.plain{ background:#0b2e59; }
+  #s0 .skill-group .sub{ margin:0 0 18px 28px; font-size:15px; color:var(--muted); }
+  #s0 .rule{
+    position:absolute; top:460px; left:64px; width:250px; height:2px; background:var(--ink);
+  }
+  #s0 .photo{
+    position:absolute; top:150px; right:90px;
+    width:340px; height:340px; border-radius:50%;
+    overflow:hidden; background:linear-gradient(135deg,#cfd6da,#9fb0b8);
+    display:flex;align-items:center;justify-content:center;
+    color:#5a6a70; font-size:15px; text-align:center; padding:20px;
+  }
+  #s0 .nameplate{
+    position:absolute; top:435px; right:35px;
+    background:var(--gray); color:#fff;
+    padding:20px 38px; font-weight:700; font-size:22px; letter-spacing:1px;
+  }
+
+  /* ===== SLIDE 1 — ABOUT ===== */
+  #s1 .title{ position:absolute; top:140px; left:64px; font-size:64px; font-weight:300; }
+  #s1 .body{
+    position:absolute; top:230px; left:210px; width:660px;
+    font-size:19px; line-height:1.6; color:var(--ink);
+  }
+  #s1 .summary{
+    position:absolute; top:490px; right:64px; width:660px;
+    font-size:15px; line-height:1.65; color:var(--muted);
+    border-right:3px solid var(--red); padding-right:20px;
+    text-align:right;
+  }
+  #s1 .summary b{ color:var(--ink); }
+  #s1 .doodle{ position:absolute; stroke:#8a8a8a; fill:none; stroke-width:2.5; }
+  #s1 .doodle1{ top:355px; right:60px; width:250px; height:100px; }
+  #s1 .doodle2{ top:665px; left:950px; width:230px; height:110px; }
+
+  /* ===== SLIDE 2 — EDUCATION ===== */
+  #s2 .banner{
+    position:absolute; top:145px; left:0; width:800px; height:100px;
+    background:var(--gray); color:#fff; display:flex; align-items:center;
+    padding-left:64px; font-size:46px; font-weight:700;
+  }
+  #s2 .cols{
+    position:absolute; top:305px; left:64px; right:64px;
+    display:flex; justify-content:space-between; gap:40px;
+  }
+  #s2 .col{ max-width:330px; }
+  #s2 .col h3{ color:var(--tan); font-size:22px; font-weight:600; margin:0 0 6px; }
+  #s2 .col h4{ font-size:16px; font-style:italic; font-weight:700; margin:0 0 14px; }
+  #s2 .col p{ font-size:15px; color:var(--ink); margin:0; }
+  #s2 .baseline{
+    position:absolute; bottom:150px; left:64px; right:200px; height:1.5px; background:var(--ink);
+  }
+
+  /* ===== SLIDE 3 — EXPERIENCE ===== */
+  #s3 .illus{
+    position:absolute; top:120px; left:65px; width:340px; height:340px;
+    border-radius:50%; background:radial-gradient(circle,#faf3d6,#f6ecc0);
+    display:flex; align-items:center; justify-content:center;
+    font-size:64px;
+  }
+  #s3 .exp-label{
+    position:absolute; top:500px; left:70px;
+    font-size:38px; font-weight:800; letter-spacing:4px; color:var(--gray-dark);
+    padding:0 22px; border-left:3px solid var(--gray-dark); border-right:3px solid var(--gray-dark);
+  }
+  #s3 .right{ position:absolute; top:78px; left:500px; width:880px; }
+  #s3 .job{ margin-bottom:26px; }
+  #s3 .right h3{ font-size:23px; font-weight:700; color:var(--gray-dark); margin:0 0 6px; }
+  #s3 .right h3::before{ content:"■ "; color:var(--gray-dark); font-size:16px;}
+  #s3 .right hr{ border:none; border-top:3px solid var(--tan); width:400px; margin:0 0 14px; }
+  #s3 .role-row{ display:flex; justify-content:space-between; margin-bottom:8px; }
+  #s3 .role-row .role{ font-style:italic; font-weight:700; font-size:17px; }
+  #s3 .role-row .years{ font-weight:600; color:var(--gray); font-size:14px; }
+  #s3 ul{ padding-left:20px; margin:0; font-size:13.5px; line-height:1.45; color:#333; }
+  #s3 ul li{ margin-bottom:8px; }
+  #s3 ul li b{ color:var(--ink); }
+
+  /* ===== SLIDE 5 — DESIGNS ===== */
+  #s5 .script{
+    position:absolute; top:150px; width:100%; text-align:center;
+    font-family:'Alex Brush',cursive; font-size:96px; color:var(--ink);
+  }
+  #s5 .grid{
+    position:absolute; top:330px; left:64px; right:64px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:26px;
+  }
+  #s5 .tile{
+    height:280px; border-radius:2px; position:relative; overflow:hidden;
+    color:#fff; display:flex; align-items:flex-end; padding:16px;
+    font-weight:700; font-size:17px; text-shadow:0 2px 6px rgba(0,0,0,.5);
+  }
+  #s5 .tile.t1{ background:linear-gradient(160deg,#1c2d55,#0e1730); }
+  #s5 .tile.t2{ background:linear-gradient(160deg,#03050f,#0f2743); }
+  #s5 .tile.t3{ background:linear-gradient(160deg,#8fc4e8,#dfeefb); color:#294a63; }
+  #s5 .tile.t4{ background:linear-gradient(160deg,#c9d7e8,#eef3f8); color:#3a4a5a; }
+
+  /* ===== SLIDE 6 — CONTACT ===== */
+  #s6 .photo{
+    position:absolute; top:70px; left:64px; width:400px; height:420px;
+    background:linear-gradient(160deg,#a9d1ea,#dfeefb);
+    display:flex; align-items:center; justify-content:center;
+    color:#3a5a72; font-size:15px; text-align:center; padding:20px;
+  }
+  #s6 .right{ position:absolute; top:80px; left:520px; width:800px; }
+  #s6 .eyebrow{ font-size:19px; letter-spacing:6px; font-weight:600; margin-bottom:12px; }
+  #s6 .script{ font-family:'Alex Brush',cursive; font-size:76px; margin:0 0 30px; }
+  #s6 .quote{
+    border-left:3px solid var(--ink); padding-left:24px;
+    font-family:'Alex Brush',cursive; font-size:27px; line-height:1.5; max-width:620px;
+  }
+  #s6 .contact-box{
+    position:absolute; top:495px; left:520px; width:590px;
+    background:var(--gray); color:#fff; padding:26px 30px;
+  }
+  #s6 .contact-box .label{ letter-spacing:4px; font-weight:700; margin-bottom:14px; }
+  #s6 .contact-box .row{ display:flex; align-items:center; gap:14px; margin-bottom:8px; font-size:15px; letter-spacing:1px; }
+  #s6 .contact-box .row .ic{ width:20px; text-align:center; }
+  #s6 .meta{
+    position:absolute; top:665px; left:520px; width:590px;
+    display:flex; justify-content:space-between; font-size:14px; color:var(--muted);
+  }
+  #s6 .meta b{ color:var(--ink); }
+
+  /* ===== SLIDE 7 — SKILLS (new, resume design toolkit) ===== */
+  #s7 .banner{
+    position:absolute; top:145px; left:0; width:800px; height:110px;
+    background:var(--gray); color:#fff; display:flex; align-items:center;
+    padding-left:64px; font-size:46px; font-weight:700;
+  }
+  #s7 .toolkit{ position:absolute; top:320px; left:100px; width:1000px; }
+  #s7 .item{ display:flex; align-items:center; gap:16px; font-size:21px; font-weight:600; margin-bottom:6px; }
+  #s7 .item .dot{ width:15px; height:15px; border-radius:50%; flex:0 0 auto; }
+  #s7 .dot.cyan{ background:#31c5f4; }
+  #s7 .dot.magenta{ background:#ee2a6f; }
+  #s7 .dot.yellow{ background:#ffb400; }
+  #s7 .dot.plain{ background:#2a2a2a; }
+  #s7 .sub{ margin:0 0 30px 31px; font-size:16px; color:var(--muted); }
+
+/* =======================================================================
+   MOBILE / SMALL SCREEN LAYOUT
+   Below 768px the fixed 1450x820 "deck" is abandoned in favor of a
+   normal stacked, scrollable, single-column page per slide.
+   ======================================================================= */
+@media (max-width: 768px){
+
+  body{
+    display:block;
+    overflow-y:auto;
+    height:auto;
+    min-height:100vh;
+    background:var(--paper);
+  }
+  #viewport{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+  .stage{
+    width:100%;
+    height:auto;
+    min-height:100vh;
+    box-shadow:none;
+    transform:none !important;
+    padding:86px 22px 50px;
+    overflow:visible;
+  }
+
+  .dots{ display:none; } /* decorative corner dots just clutter small screens */
+
+  /* ---- nav & brand: static, wrapping, compact ---- */
+  .brand{
+    position:static;
+    display:block !important;
+    margin-bottom:10px;
+    font-size:17px;
+    text-align:left;
+  }
+  .topnav{
+    position:fixed;
+    top:0; left:0; right:0;
+    background:rgba(255,255,255,0.97);
+    padding:12px 16px;
+    gap:14px;
+    flex-wrap:wrap;
+    font-size:13px;
+    z-index:30;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    justify-content:center;
+  }
+
+  /* ---- lightweight fade/rise for mobile page changes (no overlay-slide there) ---- */
+  .slide.active.mobile-in{ animation:mobileFadeIn .5s ease both; }
+  @keyframes mobileFadeIn{
+    from{ opacity:0; transform:translateY(24px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ---- swipe hint sits low, above safe-area ---- */
+  .swipe-hint{ bottom:14px; font-size:11px; }
+
+  /* generic helper: every slide's direct content stacks in normal flow */
+  .slide{ position:relative; inset:auto; }
+  .slide.active{ display:flex; flex-direction:column; }
+
+  /* ---- SLIDE 0 : COVER ---- */
+  #s0{ text-align:center; padding-top:20px; }
+  #s0 .headline{ position:static; font-size:52px; margin-bottom:6px; }
+  #s0 .subhead{ position:static; width:100%; font-size:15px; margin:0 auto 18px; }
+  #s0 .rule{ position:static; margin:0 auto 24px; }
+  #s0 .photo{ position:static; width:220px; height:220px; margin:0 auto 18px; font-size:13px; }
+  #s0 .nameplate{ position:static; display:inline-block; font-size:17px; padding:14px 26px; margin:0 auto; }
+  #s0 .hover-tip{ position:static; width:100%; margin-bottom:14px; }
+  #s0 .skills-reveal{ position:static; width:100%; height:auto; min-height:110px; margin-bottom:14px; }
+  #s0 .skill-group{ position:static; display:none; text-align:left; opacity:1; transform:none; }
+  #s0 .skill-group.show{ display:block; }
+
+  /* ---- SLIDE 1 : ABOUT ---- */
+  #s1 .title{ position:static; font-size:40px; margin-bottom:16px; }
+  #s1 .body{ position:static; width:100%; font-size:16px; margin-bottom:22px; }
+  #s1 .summary{ position:static; width:100%; text-align:left; border-right:none; border-left:3px solid var(--red); padding-left:18px; padding-right:0; font-size:14px; }
+  #s1 .doodle{ display:none; } /* decorative hand-drawn arrows, not needed on small screens */
+
+  /* ---- SLIDE 2 : EDUCATION ---- */
+  #s2 .banner{ position:static; width:100%; height:auto; padding:20px 24px; font-size:28px; margin-bottom:24px; }
+  #s2 .cols{ position:static; flex-direction:column; gap:22px; }
+  #s2 .col{ max-width:100%; }
+  #s2 .baseline{ display:none; }
+
+  /* ---- SLIDE 3 : EXPERIENCE ---- */
+  #s3 .illus{ position:static; width:150px; height:150px; font-size:44px; margin:0 auto 16px; }
+  #s3 .exp-label{ position:static; display:inline-block; margin:0 auto 24px; font-size:24px; text-align:center; }
+  #s3{ text-align:center; }
+  #s3 .right{ position:static; width:100%; text-align:left; }
+  #s3 .right hr{ width:100%; }
+  #s3 .role-row{ flex-direction:column; gap:2px; }
+
+  /* ---- SLIDE 5 : DESIGNS ---- */
+  #s5 .script{ position:static; font-size:52px; margin-bottom:20px; }
+  #s5 .grid{ position:static; grid-template-columns:repeat(2,1fr); gap:14px; }
+  #s5 .tile{ height:160px; font-size:14px; }
+
+  /* ---- SLIDE 6 : CONTACT ---- */
+  #s6 .photo{ position:static; width:100%; max-width:320px; height:260px; margin:0 auto 20px; }
+  #s6 .right{ position:static; width:100%; }
+  #s6 .script{ font-size:48px; }
+  #s6 .quote{ font-size:20px; max-width:100%; }
+  #s6 .contact-box{ position:static; width:100%; margin-top:20px; }
+  #s6 .meta{ position:static; width:100%; flex-direction:column; gap:6px; margin-top:14px; }
+
+  /* ---- SLIDE 7 : SKILLS ---- */
+  #s7 .banner{ position:static; width:100%; height:auto; padding:20px 24px; font-size:28px; margin-bottom:24px; }
+  #s7 .toolkit{ position:static; width:100%; }
+  #s7 .item{ font-size:17px; }
+}
+</style>
+</head>
+<body>
+
+<div id="viewport">
+
+  <div class="stage" id="stage">
+
+    <!-- shared decoration + nav (re-injected per slide by JS for simplicity, so define once and JS toggles) -->
+    <div class="dots tr"></div>
+    <div class="dots bl"></div>
+
+    <div class="topnav" id="topnav">
+      <a>About Me</a>
+      <a>Skills</a>
+      <a>Experience</a>
+      <a>Education</a>
+      <a>Designs</a>
+      <a>Contact</a>
+    </div>
+
+    <div class="brand" id="brand" style="display:none;"><span>Ashish</span> Mishra</div>
+
+    <!-- ================= SLIDE 0 : COVER ================= -->
+    <section class="slide active" id="s0">
+      <div class="headline">Portfolio</div>
+      <div class="subhead">
+        <div class="role-gd">GRAPHIC DESIGNER</div>
+        <div class="role-ui">UI/UX DESIGNER</div>
+        <div class="role-ve">VIDEO EDITOR</div>
+      </div>
+      <div class="hover-tip">HOVER A ROLE TO SEE RELATED SKILLS</div>
+      <div class="skills-reveal" id="skillsReveal">
+        <div class="skill-group" data-role="gd">
+          <div class="item"><span class="dot cyan"></span> Photoshop · Illustrator</div>
+          <div class="sub">InDesign · Corel Draw</div>
+          <div class="item"><span class="dot plain"></span> Typography · Color Theory · Layout</div>
+          <div class="sub">Canva · MS Suite</div>
+        </div>
+        <div class="skill-group" data-role="ui">
+          <div class="item"><span class="dot magenta"></span> Adobe XD · Figma</div>
+          <div class="sub">Wireframes · UX layout</div>
+        </div>
+        <div class="skill-group" data-role="ve">
+          <div class="item"><span class="dot yellow"></span> Premiere Pro · After Effects</div>
+          <div class="sub">Motion &amp; video editing</div>
+        </div>
+      </div>
+      <div class="rule"></div>
+      <div class="photo">Your headshot here<br>(replace this block with an &lt;img&gt;)</div>
+      <div class="nameplate">ASHISH MISHRA</div>
+    </section>
+
+    <!-- ================= SLIDE 1 : ABOUT ================= -->
+    <section class="slide" id="s1">
+      <div class="title">About me</div>
+      <svg class="doodle doodle1" viewBox="0 0 250 100"><path d="M5,40 C60,10 90,80 130,45 C150,28 160,45 170,55 L200,45 L190,35 M200,45 L188,58"/></svg>
+      <div class="body">Hello, I'm Ashish Mishra, a graphic designer that is enthusiastic about turning concepts into visually stunning experiences. Welcome to my portfolio, where meaningful stories are created by combining pixels and imagination.</div>
+      <div class="summary">Creative design professional with 3+ years of experience spanning Graphic Design, UI/UX, and Video Editing within a global professional-services environment. Skilled in Adobe Creative Suite (Photoshop, Illustrator, InDesign, Premiere Pro, After Effects) and UI/UX tools (Adobe XD, Figma), with hands-on experience creating high-volume digital ad creatives, motion assets for OTT and TV platforms, and layouts optimized for user experience. Balances complex design requirements with tight deadlines while holding strict brand and platform standards.</div>
+      <svg class="doodle doodle2" viewBox="0 0 230 110"><path d="M5,15 C40,-10 55,40 85,20 C110,4 120,45 150,25 C175,9 185,45 210,28 C218,23 222,20 225,10"/></svg>
+    </section>
+
+    <!-- ================= SLIDE 7 : SKILLS (new) ================= -->
+    <section class="slide" id="s7">
+      <div class="banner">Skills</div>
+      <div class="toolkit">
+        <div class="item"><span class="dot cyan"></span> Photoshop · Illustrator</div>
+        <div class="sub">InDesign · Corel Draw</div>
+        <div class="item"><span class="dot magenta"></span> Adobe XD · Figma</div>
+        <div class="sub">Wireframes · UX layout</div>
+        <div class="item"><span class="dot yellow"></span> Premiere Pro · After Effects</div>
+        <div class="sub">Motion &amp; video editing</div>
+        <div class="item"><span class="dot plain"></span> Typography · Color Theory · Layout</div>
+        <div class="sub">Canva · MS Suite</div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 2 : EDUCATION ================= -->
+    <section class="slide" id="s2">
+      <div class="banner">Education background</div>
+      <div class="cols">
+        <div class="col">
+          <h3>Senior Secondary Certification</h3>
+          <h4>Central Board of Secondary Certification</h4>
+          <p>Kendriya Vidyalaya, Airforce Station, Thane</p>
+        </div>
+        <div class="col">
+          <h3>Higher Secondary Certification</h3>
+          <h4>Maharashtra Board</h4>
+          <p>Shivai Junior College, Thane</p>
+        </div>
+        <div class="col">
+          <h3>Bachelor of Management Studies</h3>
+          <h4>Mumbai University</h4>
+          <p>Model College</p>
+        </div>
+      </div>
+      <div class="baseline"></div>
+    </section>
+
+    <!-- ================= SLIDE 3 : EXPERIENCE ================= -->
+    <section class="slide" id="s3">
+      <div class="illus">🎨</div>
+      <div class="exp-label">EXPERIENCE</div>
+      <div class="right">
+        <div class="job">
+          <h3>Nielsen</h3>
+          <hr>
+          <div class="role-row">
+            <span class="role">Image Specialist</span>
+            <span class="years">SEPT 2021 — PRESENT</span>
+          </div>
+          <ul>
+            <li><b>Digital &amp; Video Design</b> — Designed illustrations, typography, and complex layouts for OTT and TV platforms, blending graphic design with video-editing workflows.</li>
+            <li><b>UI/UX &amp; Visual Strategy</b> — Applied space and colour theory to improve user experience (UX) across digital marketing assets.</li>
+            <li><b>Operational Efficiency</b> — Streamlined sourcing and editing of broadcaster logos and program banners, accelerating campaign time-to-market.</li>
+            <li><b>Brand Adherence</b> — Managed logo and sports-banner creation with 100% adherence to broadcaster and global brand guidelines.</li>
+            <li><b>Team Collaboration</b> — Key individual contributor, solving design problems and meeting daily delivery targets with peers.</li>
+          </ul>
+        </div>
+        <div class="job">
+          <h3>Catalyst Corporate Services Pvt. Ltd.</h3>
+          <hr>
+          <div class="role-row">
+            <span class="role">App Support Executive</span>
+            <span class="years">OCT 2020 — JUNE 2021</span>
+          </div>
+          <ul>
+            <li><b>Communication</b> — Managed professional correspondence and complaint redressal, building strong written and verbal skills.</li>
+            <li><b>Operational Support</b> — Provided technical support and documentation, ensuring high customer engagement.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 5 : DESIGNS ================= -->
+    <section class="slide" id="s5">
+      <div class="script">My Designs</div>
+      <div class="grid">
+        <div class="tile t1">Disney Delights<br><span style="font-weight:400;font-size:13px;">(swap in project image)</span></div>
+        <div class="tile t2">The High-Tea Post — Cosmic Chronicles</div>
+        <div class="tile t3">Winter Branches — photo edit</div>
+        <div class="tile t4">Birds in Flight — photo edit</div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 6 : CONTACT ================= -->
+    <section class="slide" id="s6">
+      <div class="photo">Nature photo here<br>(replace this block with an &lt;img&gt;)</div>
+      <div class="right">
+        <div class="eyebrow">GRAPHIC DESIGNER</div>
+        <div class="script">Thank You</div>
+        <div class="quote">I may not have a lot of experience, but I'm full of enthusiasm for design and eager to learn. I'm not afraid to bring new ideas to the table and I'm always looking for ways to improve.</div>
+      </div>
+      <div class="contact-box">
+        <div class="label">CONTACT :</div>
+        <div class="row"><span class="ic">📞</span> 7208446505</div>
+        <div class="row"><span class="ic">✉️</span> ASHISH5111996@GMAIL.COM</div>
+      </div>
+      <div class="meta">
+        <span><b>Languages:</b> English, Hindi — both fluent</span>
+        <span><b>Availability:</b> open to rotational shifts</span>
+      </div>
+    </section>
+
+    <!-- ================= SWIPE HINT (replaces Back/Next buttons) ================= -->
+    <div class="swipe-hint" id="swipeHint">▲ SCROLL / SWIPE UP FOR NEXT ▲</div>
+
+  </div>
+</div>
+
+<script>
+  const slides = ['s0','s1','s7','s3','s2','s5','s6'];
+  // nav order: About Me, Skills, Experience, Education, Designs, Contact
+  const navGroupOf = [0,0,1,2,3,4,5];       // which nav item is "active" for each slide (by position in `slides`)
+  const navJumpTarget = [1,2,3,4,5,6];      // clicking nav item i jumps to this position in `slides`
+  let current = 0;
+
+  const navLinks = document.querySelectorAll('#topnav a');
+  const brand = document.getElementById('brand');
+  const swipeHint = document.getElementById('swipeHint');
+  const stage = document.getElementById('stage');
+
+  function isDesktop(){ return window.innerWidth > 768; }
+
+  const ANIM_MS = 650;
+  let animating = false;
+
+  // stagger a "flying in" animation across a slide's content pieces —
+  // top-level blocks plus common nested item types (columns, tiles, list rows, etc.)
+  function animateContentIn(slideEl){
+    const nodes = slideEl.querySelectorAll(
+      ':scope > *, .col, .tile, .job, .item, li, .role-row, .sub'
+    );
+    Array.from(nodes).forEach((el, i)=>{
+      el.classList.remove('fly-in');
+      void el.offsetWidth; // force reflow so the animation restarts every time
+      el.style.animationDelay = (Math.min(i, 14) * 60) + 'ms';
+      el.classList.add('fly-in');
+    });
+  }
+
+  function goNext(){ navigateTo(current + 1, 'next'); }
+  function goBack(){ navigateTo(current - 1, 'back'); }
+
+  function updateChrome(){
+    navLinks.forEach((a,i)=>{ a.classList.toggle('active', navGroupOf[current]===i); });
+    brand.style.display = current===0 ? 'none' : 'block';
+    swipeHint.classList.toggle('hide', current===slides.length-1);
+  }
+
+  function navigateTo(target, direction){
+    if(animating || target<0 || target>slides.length-1 || target===current) return;
+    if(isDesktop()) desktopTransition(target, direction);
+    else mobileTransition(target);
+  }
+
+  // Desktop: both the outgoing and incoming section are visible at once and
+  // literally slide past each other, like scrolling through one long page.
+  function desktopTransition(target, direction){
+    animating = true;
+    const oldEl = document.getElementById(slides[current]);
+    const newEl = document.getElementById(slides[target]);
+    const forward = direction === 'next';
+
+    newEl.style.transition = 'none';
+    newEl.style.transform = forward ? 'translateY(100%)' : 'translateY(-100%)';
+    newEl.classList.add('active');
+    void newEl.offsetHeight; // force reflow so the starting position registers before animating
+
+    requestAnimationFrame(()=>{
+      oldEl.classList.add('transitioning');
+      newEl.classList.add('transitioning');
+      oldEl.style.transform = forward ? 'translateY(-100%)' : 'translateY(100%)';
+      newEl.style.transform = 'translateY(0)';
+      animateContentIn(newEl);
+    });
+
+    current = target;
+    updateChrome();
+
+    setTimeout(()=>{
+      oldEl.classList.remove('active','transitioning');
+      oldEl.style.transform = '';
+      newEl.classList.remove('transitioning');
+      newEl.style.transform = '';
+      animating = false;
+    }, ANIM_MS + 30);
+  }
+
+  // Mobile: sections already stack in normal document flow, so a light
+  // fade + rise reads as a continuous page rather than a slide-deck jump.
+  function mobileTransition(target){
+    animating = true;
+    document.getElementById(slides[current]).classList.remove('active');
+    current = target;
+    const newEl = document.getElementById(slides[current]);
+    newEl.classList.add('active','mobile-in');
+    animateContentIn(newEl);
+    updateChrome();
+    window.scrollTo({top:0, behavior:'auto'});
+    setTimeout(()=>{
+      newEl.classList.remove('mobile-in');
+      animating = false;
+    }, 520);
+  }
+
+  navLinks.forEach((a,i)=>{
+    a.addEventListener('click', ()=>{
+      const target = navJumpTarget[i];
+      navigateTo(target, target > current ? 'next' : 'back');
+    });
+  });
+  brand.addEventListener('click', ()=>{ navigateTo(0, 'back'); });
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight' || e.key==='ArrowDown') goNext();
+    if(e.key==='ArrowLeft' || e.key==='ArrowUp') goBack();
+  });
+
+  // ---- swipe gesture support (touch) — vertical: swipe up = next, swipe down = back ----
+  let touchStartX = 0, touchStartY = 0;
+  stage.addEventListener('touchstart', (e)=>{
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, {passive:true});
+  stage.addEventListener('touchend', (e)=>{
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    const MIN_SWIPE = 50;
+    // only treat as a page-swipe if the vertical movement dominates
+    if(Math.abs(dy) > MIN_SWIPE && Math.abs(dy) > Math.abs(dx) * 1.5){
+      if(dy < 0) goNext(); else goBack(); // swipe up -> next, swipe down -> back
+    }
+  }, {passive:true});
+
+  // ---- mouse scroll-wheel paging (desktop) ----
+  window.addEventListener('wheel', (e)=>{
+    if(!isDesktop()) return; // let mobile scroll naturally within a page
+    if(Math.abs(e.deltaY) < 12) return;
+    if(e.deltaY > 0) goNext(); else goBack();
+  }, {passive:true});
+
+  // ---- cover-page hover reveal: role label -> matching skill group ----
+  const roleMap = { gd:'.role-gd', ui:'.role-ui', ve:'.role-ve' };
+  Object.keys(roleMap).forEach(role=>{
+    const label = document.querySelector('#s0 ' + roleMap[role]);
+    const group = document.querySelector('#s0 .skill-group[data-role="' + role + '"]');
+    if(!label || !group) return;
+    const show = ()=>{
+      document.querySelectorAll('#s0 .skill-group').forEach(g=>g.classList.remove('show'));
+      group.classList.add('show');
+    };
+    const hide = ()=>{ group.classList.remove('show'); };
+    label.addEventListener('mouseenter', show);
+    label.addEventListener('mouseleave', hide);
+    label.addEventListener('touchstart', ()=>{ show(); }, {passive:true});
+  });
+
+  // scale stage to fit viewport on desktop; on mobile the CSS media query
+  // switches to a normal stacked layout, so no transform is applied there.
+  function fitStage(){
+    const stage = document.getElementById('stage');
+    if(window.innerWidth <= 768){
+      stage.style.transform = 'none';
+      return;
+    }
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const scale = Math.min(vw/1450, vh/820) * 0.96;
+    stage.style.transform = `scale(${scale})`;
+  }
+  window.addEventListener('resize', fitStage);
+  fitStage();
+  updateChrome();
+  animateContentIn(document.getElementById(slides[0]));
+</script>
+
+</body>
+</html>
