@@ -103,7 +103,8 @@
   .eyebrow-tag{ display:inline-block; font-size:12px; font-weight:700; letter-spacing:2px; color:var(--blue); margin-bottom:14px; }
   .hero h1{ font-size:56px; font-weight:800; line-height:1.08; margin:0 0 4px; color:var(--navy); }
   .hero h1.sub{ color:#b9bfe0; position:relative; z-index:1; }
-  .hero .grid > div:first-child{ position:relative; padding-top:100px; }
+  .hero-text{ order:1; position:relative; padding-top:100px; }
+  .hero-art{ order:2; }
   .hero h1:not(.sub){
     position:absolute; top:-30px; left:-4px; right:0;
     font-size:120px; color:#dde1f7; z-index:0;
@@ -333,13 +334,19 @@
   @media (max-width:900px){
     nav ul{ gap:16px; }
     nav a{ font-size:13px; }
-    .hero .grid{ grid-template-columns:1fr 100px; align-items:flex-start; gap:14px; }
+    .hero .grid{ display:block; }
+    .hero-text{ padding-top:44px; }
     .hero h1.sub{ font-size:36px; }
     .hero h1:not(.sub){ font-size:52px; top:-12px; }
-    .hero .grid > div:first-child{ padding-top:40px; }
-    .hero-art{ max-width:100px; }
-    .hero-art .role-label{ font-size:10px; }
-    .hero-art .role-label .arrow{ font-size:12px; margin-top:0; }
+    .hero-art{
+      float:right; width:50%; max-width:220px; aspect-ratio:auto;
+      margin:44px 0 16px 16px;
+    }
+    .hero .cta-row{ clear:right; }
+    .hero-art .headshot{ width:100%; height:auto; }
+    .hero-art .headshot img.ph{ height:auto; }
+    .hero-art .role-label{ font-size:12px; top:-10%; }
+    .hero-art .role-label .arrow{ font-size:14px; }
     .about .grid{ grid-template-columns:1fr; }
     .about-photo{ display:none; }
     .proj-row{ grid-template-columns:repeat(2,1fr); }
@@ -409,7 +416,11 @@
   <img class="hero-doodle left" src="images/hero-doodle-Left.png" alt="" aria-hidden="true">
   <img class="hero-doodle right" src="images/hero-doodle-right.png" alt="" aria-hidden="true">
   <div class="wrap grid">
-    <div class="reveal show">
+    <div class="hero-art reveal show">
+      <div class="headshot"><img class="ph" src="images/headshot.png" alt="Ashish Mishra"></div>
+      <div class="role-label">Graphic Designer<span class="arrow">&#8595;</span></div>
+    </div>
+    <div class="hero-text reveal show">
       <span class="eyebrow-tag">PORTFOLIO</span>
       <h1>Creative</h1>
       <h1 class="sub">Graphic Designer.</h1>
@@ -418,10 +429,6 @@
         <a href="#designs" class="btn btn-grad">View My Work</a>
         <a href="#contact" class="btn btn-outline">Get In Touch</a>
       </div>
-    </div>
-    <div class="hero-art reveal show">
-      <div class="headshot"><img class="ph" src="images/headshot.png" alt="Ashish Mishra"></div>
-      <div class="role-label">Graphic Designer<span class="arrow">&#8595;</span></div>
     </div>
   </div>
 </section>
