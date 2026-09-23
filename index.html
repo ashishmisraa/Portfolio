@@ -162,7 +162,7 @@
   .sec-head p{ color:var(--muted); font-size:15px; line-height:1.7; margin:0; }
 
   /* ---------- about ---------- */
-  .about{ padding:60px 0; }
+  .about{ padding:60px 0; position:relative; }
   .about .grid{ display:grid; grid-template-columns:0.8fr 1.2fr; gap:50px; align-items:center; }
   .about-photo{
     aspect-ratio:4/5;
@@ -198,7 +198,9 @@
   .gallery-grid img{
     display:block; width:100%; height:auto;
     border-radius:14px; box-shadow:var(--shadow); background:#f4f5f8;
+    cursor:pointer; transition:opacity .2s ease;
   }
+  .gallery-grid img:hover{ opacity:0.9; }
   .gallery-grid figcaption{ font-size:12.5px; color:var(--muted); margin-top:8px; text-align:center; }
   @media (max-width:900px){
     .gallery-grid{ column-count:3; }
@@ -210,6 +212,27 @@
   @media (max-width:400px){
     .gallery-grid{ column-count:1; }
   }
+
+  /* ---------- fullscreen image viewer ---------- */
+  .fs-viewer{
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(8,10,26,.94);
+    display:none; align-items:center; justify-content:center;
+    padding:30px;
+  }
+  .fs-viewer.open{ display:flex; }
+  .fs-viewer img{
+    max-width:100%; max-height:100%;
+    border-radius:10px;
+    box-shadow:0 24px 70px rgba(0,0,0,.5);
+  }
+  .fs-close{
+    position:fixed; top:20px; right:20px; z-index:10000;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(255,255,255,.15); border:none; color:#fff;
+    font-size:24px; line-height:1; cursor:pointer;
+  }
+  .fs-close:hover{ background:rgba(255,255,255,.3); }
 
   .proj-thumb{
     height:170px; display:flex; align-items:center; justify-content:center;
@@ -348,7 +371,11 @@
     .hero-art .role-label{ font-size:12px; top:-10%; }
     .hero-art .role-label .arrow{ font-size:14px; }
     .about .grid{ grid-template-columns:1fr; }
-    .about-photo{ display:none; }
+    .about-photo{
+      position:absolute; inset:0; aspect-ratio:auto;
+      opacity:0.01; z-index:0; pointer-events:none;
+    }
+    .about-text{ position:relative; z-index:1; }
     .proj-row{ grid-template-columns:repeat(2,1fr); }
     .toolkit .cards{ grid-template-columns:1fr; }
     .edu-row{ grid-template-columns:1fr; }
@@ -438,7 +465,7 @@
 <section class="about" id="about">
   <div class="wrap grid">
     <div class="about-photo reveal"><img class="ph" src="images/Headshot2.png" alt="Ashish Mishra"></div>
-    <div class="reveal">
+    <div class="about-text reveal">
       <span class="eyebrow-tag">◆ ABOUT ME</span>
       <h2>Hello, I'm Ashish Mishra</h2>
       <p>A graphic designer that is enthusiastic about turning concepts into visually stunning experiences. Welcome to my portfolio, where meaningful stories are created by combining pixels and imagination.</p>
@@ -638,6 +665,12 @@
     <div id="designGalleries"></div>
   </div>
 </section>
+
+<!-- ================= FULLSCREEN IMAGE VIEWER ================= -->
+<div class="fs-viewer" id="fsViewer">
+  <button class="fs-close" id="fsClose" type="button" aria-label="Close">&times;</button>
+  <img id="fsImage" src="" alt="">
+</div>
 
 <!-- ================= CONTACT ================= -->
 <section class="contact" id="contact">
@@ -865,6 +898,7 @@
           }
         });
         fig.appendChild(img);
+        img.addEventListener('click', ()=> openFullscreen(img.src, img.alt));
         if(data.captions && data.captions[i]){
           const cap = document.createElement('figcaption');
           cap.textContent = data.captions[i];
@@ -877,6 +911,31 @@
       container.appendChild(section);
     });
   })();
+
+  // ---- fullscreen image viewer: click any gallery photo to open it full screen ----
+  const fsViewer = document.getElementById('fsViewer');
+  const fsImage = document.getElementById('fsImage');
+  const fsClose = document.getElementById('fsClose');
+
+  function openFullscreen(src, alt){
+    fsImage.src = src;
+    fsImage.alt = alt || '';
+    fsViewer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFullscreen(){
+    fsViewer.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  fsClose.addEventListener('click', closeFullscreen);
+  fsViewer.addEventListener('click', (e)=>{
+    if(e.target === fsViewer) closeFullscreen(); // click on the dark backdrop closes it
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && fsViewer.classList.contains('open')) closeFullscreen();
+  });
 
   </script>
 
