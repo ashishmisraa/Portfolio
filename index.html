@@ -183,34 +183,32 @@
   .proj-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
   .proj-card{ border-radius:18px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
 
-  /* ---------- inline scrollable design gallery (no tabs, no popup) ---------- */
-  .gallery-category{ margin-bottom:56px; }
+  /* ---------- inline scrollable design gallery: compact collage, no tabs, no popup ---------- */
+  .gallery-category{ margin-bottom:40px; }
   .gallery-category:last-child{ margin-bottom:0; }
   .gallery-category h3{ font-size:22px; font-weight:800; margin:0 0 6px; color:var(--navy); }
-  .gallery-category .cat-desc{ font-size:14px; color:var(--muted); margin:0 0 20px; }
+  .gallery-category .cat-desc{ font-size:14px; color:var(--muted); margin:0 0 14px; }
   .gallery-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:18px;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    grid-auto-rows:170px;
+    gap:8px;
   }
-  .gallery-grid figure{ margin:0; }
-  .gallery-grid figure.wide-fig{ grid-column:1 / -1; }
-  .gallery-grid figure.wide-fig img{ width:100%; max-height:70vh; object-fit:contain; }
+  .gallery-grid figure{ margin:0; height:100%; }
+  .gallery-grid figure.wide-fig{ grid-column:1 / -1; height:240px; }
   .gallery-grid img{
-    display:block; width:100%; height:auto;
-    border-radius:14px; box-shadow:var(--shadow); background:#f4f5f8;
+    display:block; width:100%; height:100%; object-fit:cover;
+    border-radius:10px; background:#f4f5f8;
     cursor:pointer; transition:opacity .2s ease;
   }
   .gallery-grid img:hover{ opacity:0.9; }
-  .gallery-grid figcaption{ font-size:12.5px; color:var(--muted); margin-top:8px; text-align:center; }
   @media (max-width:900px){
-    .gallery-grid{ grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+    .gallery-grid{ grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); grid-auto-rows:130px; }
+    .gallery-grid figure.wide-fig{ height:190px; }
   }
   @media (max-width:600px){
-    .gallery-grid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
-  }
-  @media (max-width:400px){
-    .gallery-grid{ grid-template-columns:1fr; }
+    .gallery-grid{ grid-template-columns:repeat(auto-fill,minmax(105px,1fr)); gap:6px; grid-auto-rows:105px; }
+    .gallery-grid figure.wide-fig{ height:150px; }
   }
 
   /* ---------- fullscreen image viewer ---------- */
@@ -221,10 +219,17 @@
     padding:30px;
   }
   .fs-viewer.open{ display:flex; }
-  .fs-viewer img{
+  .fs-stage{
+    display:flex; flex-direction:column; align-items:center; gap:12px;
     max-width:100%; max-height:100%;
+  }
+  .fs-stage img{
+    max-width:100%; max-height:80vh;
     border-radius:10px;
     box-shadow:0 24px 70px rgba(0,0,0,.5);
+  }
+  .fs-caption{
+    color:#e8eaf6; font-size:14px; text-align:center; max-width:600px; margin:0;
   }
   .fs-close{
     position:fixed; top:20px; right:20px; z-index:10000;
@@ -672,7 +677,10 @@
 <!-- ================= FULLSCREEN IMAGE VIEWER ================= -->
 <div class="fs-viewer" id="fsViewer">
   <button class="fs-close" id="fsClose" type="button" aria-label="Close">&times;</button>
-  <img id="fsImage" src="" alt="">
+  <div class="fs-stage">
+    <img id="fsImage" src="" alt="">
+    <p class="fs-caption" id="fsCaption"></p>
+  </div>
 </div>
 
 <!-- ================= CONTACT ================= -->
@@ -899,17 +907,13 @@
           }
         });
         fig.appendChild(img);
-        img.addEventListener('click', ()=> openFullscreen(img.src, img.alt));
+        const captionText = (data.captions && data.captions[i]) ? data.captions[i] : '';
+        img.addEventListener('click', ()=> openFullscreen(img.src, img.alt, captionText));
         img.addEventListener('load', ()=>{
           if(img.naturalWidth / img.naturalHeight > 1.4){
             fig.classList.add('wide-fig'); // wide/landscape photos span the full row, left to right
           }
         });
-        if(data.captions && data.captions[i]){
-          const cap = document.createElement('figcaption');
-          cap.textContent = data.captions[i];
-          fig.appendChild(cap);
-        }
         grid.appendChild(fig);
       });
       section.appendChild(grid);
@@ -922,10 +926,13 @@
   const fsViewer = document.getElementById('fsViewer');
   const fsImage = document.getElementById('fsImage');
   const fsClose = document.getElementById('fsClose');
+  const fsCaption = document.getElementById('fsCaption');
 
-  function openFullscreen(src, alt){
+  function openFullscreen(src, alt, caption){
     fsImage.src = src;
     fsImage.alt = alt || '';
+    fsCaption.textContent = caption || '';
+    fsCaption.style.display = caption ? 'block' : 'none';
     fsViewer.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
