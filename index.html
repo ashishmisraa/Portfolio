@@ -382,7 +382,10 @@
     }
     .about-text{
       position:relative; z-index:1;
-      text-shadow:0 0 6px #fff, 0 0 10px #fff, 0 1px 2px #fff;
+      background:rgba(238,240,251,0.92);
+      border-radius:16px;
+      padding:18px;
+      margin:0 -18px;
     }
     .proj-row{ grid-template-columns:repeat(2,1fr); }
     .toolkit .cards{ grid-template-columns:1fr; }
@@ -438,8 +441,8 @@
         <li><a href="#about" data-target="about">About Me</a></li>
         <li><a href="#skills" data-target="skills">Skills</a></li>
         <li><a href="#experience" data-target="experience">Experience</a></li>
-        <li><a href="#education" data-target="education">Education</a></li>
         <li><a href="#designs" data-target="designs">Designs</a></li>
+        <li><a href="#education" data-target="education">Education</a></li>
         <li><a href="#contact" data-target="contact">Contact</a></li>
       </ul>
     </nav>
@@ -597,6 +600,18 @@
   </div>
 </section>
 
+<!-- ================= RECENT DESIGNS ================= -->
+<section class="projects" id="designs">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow-tag">◆ PORTFOLIO</span>
+      <h2>Design</h2>
+      <p>A collection of my work — scroll down to see everything.</p>
+    </div>
+    <div id="designGalleries"></div>
+  </div>
+</section>
+
 <!-- ================= EDUCATION ================= -->
 <section class="education" id="education">
   <div class="wrap">
@@ -659,18 +674,6 @@
         <p><em>In Progress</em></p>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ================= RECENT DESIGNS ================= -->
-<section class="projects" id="designs">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow-tag">◆ PORTFOLIO</span>
-      <h2>Design</h2>
-      <p>A collection of my work — scroll down to see everything.</p>
-    </div>
-    <div id="designGalleries"></div>
   </div>
 </section>
 
