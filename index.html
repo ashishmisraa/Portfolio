@@ -183,7 +183,7 @@
   .proj-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
   .proj-card{ border-radius:18px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
 
-  /* ---------- inline scrollable design gallery: bold headers + varied-size masonry collage ---------- */
+  /* ---------- inline scrollable design gallery: bold headers + horizontal swipe / scroll strips ---------- */
   .gallery-category{ margin-bottom:52px; }
   .gallery-category:last-child{ margin-bottom:0; }
   .gallery-category .cat-head{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
@@ -194,29 +194,52 @@
   .gallery-category h3{ font-size:27px; font-weight:800; margin:0; color:var(--navy); }
   .gallery-category .cat-desc{ font-size:14px; color:var(--muted); margin:6px 0 16px; }
 
-  /* True masonry: every image keeps its natural proportions. A fine 4px row unit lets
-     each tile span exactly as many rows as its real height needs (set by JS), so tiles
-     of different heights/widths pack tightly together like the reference layout. */
+  /* Swipe / scroll gallery: each category is one horizontal strip. Every image keeps its
+     natural proportions (fixed height, width follows the photo), so there are no gaps and
+     the page stays short. Swipe on phones, drag / scroll / use the arrows on desktop. */
+  .gallery-wrap{ position:relative; }
   .gallery-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
-    grid-auto-rows:4px;
-    grid-auto-flow:dense;
-    column-gap:10px;
-    row-gap:0;
+    display:flex; gap:10px;
+    height:auto;
+    overflow-x:auto; overflow-y:hidden;
+    scroll-snap-type:x proximity;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    scrollbar-width:thin;
+    padding-bottom:10px;
+    cursor:grab;
   }
-  .gallery-grid figure{ margin:0; align-self:start; }
-  .gallery-grid figure:not(.ready){ grid-row-end:span 40; min-height:150px; background:#f4f5f8; border-radius:10px; }
-  .gallery-grid figure.span2{ grid-column:span 2; }
-  .gallery-grid figure.wide-fig{ grid-column:1 / -1; }
+  .gallery-grid.dragging{ cursor:grabbing; scroll-snap-type:none; }
+  .gallery-grid figure{
+    flex:0 0 auto; margin:0; height:260px;
+    scroll-snap-align:start;
+    min-width:160px; background:#f4f5f8; border-radius:10px;
+  }
   .gallery-grid img{
-    display:block; width:100%; height:auto;
-    border-radius:10px; background:#f4f5f8;
+    display:block; height:100%; width:auto;
+    border-radius:10px;
     cursor:pointer; transition:opacity .2s ease;
+    user-select:none; -webkit-user-drag:none;
   }
   .gallery-grid img:hover{ opacity:0.9; }
+  .gallery-grid::-webkit-scrollbar{ height:6px; }
+  .gallery-grid::-webkit-scrollbar-thumb{ background:#c9cdea; border-radius:6px; }
+
+  .gal-arrow{
+    position:absolute; top:calc(50% - 5px); transform:translateY(-50%); z-index:3;
+    width:42px; height:42px; border-radius:50%; border:none;
+    background:rgba(18,22,58,.78); color:#fff; font-size:22px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 16px rgba(18,22,58,.25);
+    transition:opacity .2s ease, background .2s ease;
+  }
+  .gal-arrow:hover{ background:var(--navy); }
+  .gal-arrow.prev{ left:8px; }
+  .gal-arrow.next{ right:8px; }
+  .gal-arrow[hidden]{ display:none; }
+  @media (hover:none){ .gal-arrow{ display:none; } } /* touch screens just swipe */
   @media (max-width:600px){
-    .gallery-grid{ grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); column-gap:8px; }
+    .gallery-grid figure{ height:190px; min-width:120px; }
     .gallery-category h3{ font-size:22px; }
   }
 
@@ -826,7 +849,13 @@
         "images/designs/17.jpg",
         "images/designs/18.jpg",
         "images/designs/19.jpg",
-        "images/designs/20.jpg"
+        "images/designs/20.jpg",
+        "images/designs/21.jpg",
+        "images/designs/22.jpg",
+        "images/designs/23.jpg",
+        "images/designs/24.jpg",
+        "images/designs/25.jpg",
+        "images/designs/26.jpg"
       ]
     },
     uiux: {
@@ -886,7 +915,6 @@
   // ---- build the inline, scrollable design gallery (no tabs, no popup) ----
   // Loops through each category in galleryData and renders it directly on the
   // page as a heading + a grid of images. Nothing here needs to be clicked open.
-  const masonryItems = [];
   (function buildInlineGalleries(){
     const container = document.getElementById('designGalleries');
     const tagColors = { designs:'#1c2d55', uiux:'#ee2a6f', photography:'#4f7df3', beforeafter:'#f4b400' };
@@ -913,61 +941,84 @@
       desc.textContent = data.desc;
       section.appendChild(desc);
 
+      const wrap = document.createElement('div');
+      wrap.className = 'gallery-wrap';
       const grid = document.createElement('div');
       grid.className = 'gallery-grid';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.type = 'button'; prevBtn.className = 'gal-arrow prev';
+      prevBtn.setAttribute('aria-label', 'Scroll left'); prevBtn.innerHTML = '&#8249;';
+      const nextBtn = document.createElement('button');
+      nextBtn.type = 'button'; nextBtn.className = 'gal-arrow next';
+      nextBtn.setAttribute('aria-label', 'Scroll right'); nextBtn.innerHTML = '&#8250;';
+
+      // show / hide the arrows depending on whether there is more to scroll to
+      function updateArrows(){
+        const max = grid.scrollWidth - grid.clientWidth;
+        prevBtn.hidden = grid.scrollLeft <= 4;
+        nextBtn.hidden = max <= 4 || grid.scrollLeft >= max - 4;
+      }
+      prevBtn.addEventListener('click', ()=> grid.scrollBy({ left: -grid.clientWidth * 0.85, behavior: 'smooth' }));
+      nextBtn.addEventListener('click', ()=> grid.scrollBy({ left:  grid.clientWidth * 0.85, behavior: 'smooth' }));
+      grid.addEventListener('scroll', updateArrows, { passive: true });
+      window.addEventListener('resize', updateArrows);
+
+      // desktop: click-and-drag the strip sideways (touch screens use native swipe)
+      let isDown = false, startX = 0, startScroll = 0, moved = false;
+      grid.addEventListener('pointerdown', (e)=>{
+        if(e.pointerType !== 'mouse' || e.button !== 0) return;
+        isDown = true; moved = false;
+        startX = e.clientX; startScroll = grid.scrollLeft;
+      });
+      window.addEventListener('pointermove', (e)=>{
+        if(!isDown) return;
+        const dx = e.clientX - startX;
+        if(Math.abs(dx) > 5){ moved = true; grid.classList.add('dragging'); }
+        if(moved) grid.scrollLeft = startScroll - dx;
+      });
+      window.addEventListener('pointerup', ()=>{
+        if(!isDown) return;
+        isDown = false;
+        grid.classList.remove('dragging');
+        setTimeout(()=>{ moved = false; }, 0); // lets the click handler see "moved" first
+      });
+
       data.images.forEach((src, i)=>{
         const fig = document.createElement('figure');
         const img = document.createElement('img');
         img.src = (src.indexOf('PASTE_') === 0) ? PLACEHOLDER_IMG : src;
         img.alt = data.title + ' photo ' + (i + 1);
         img.loading = 'lazy';
+        img.draggable = false;
         // if the file doesn't actually exist yet (404), remove it silently
         // instead of showing a broken-image box
         img.addEventListener('error', ()=>{
           fig.remove();
           if(grid.children.length === 0){
             section.remove(); // no real images loaded for this category at all
+          } else {
+            updateArrows();
           }
         });
+        img.addEventListener('load', updateArrows);
         fig.appendChild(img);
         const captionText = (data.captions && data.captions[i]) ? data.captions[i] : '';
-        img.addEventListener('click', ()=> openFullscreen(img.src, img.alt, captionText));
-        img.addEventListener('load', ()=> layoutMasonryItem(fig, img));
-        masonryItems.push({ fig, img });
+        img.addEventListener('click', ()=>{
+          if(moved) return; // it was a drag, not a click
+          openFullscreen(img.src, img.alt, captionText);
+        });
         grid.appendChild(fig);
       });
-      section.appendChild(grid);
 
+      wrap.appendChild(prevBtn);
+      wrap.appendChild(grid);
+      wrap.appendChild(nextBtn);
+      section.appendChild(wrap);
       container.appendChild(section);
-    });
-
-    // re-measure everything when the window is resized (column widths change, so heights change)
-    let resizeTimer;
-    window.addEventListener('resize', ()=>{
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(()=>{
-        masonryItems.forEach(({fig, img})=>{
-          if(fig.isConnected && fig.classList.contains('ready')) layoutMasonryItem(fig, img);
-        });
-      }, 150);
+      updateArrows();
     });
   })();
-
-  // ---- masonry layout helpers ----
-  // Each image keeps its natural proportions. Wide pictures span 2 columns (very wide ones
-  // span the whole row); then the tile's real rendered height decides how many 4px grid
-  // rows it occupies, so tiles of different shapes pack tightly with no empty gaps.
-  function layoutMasonryItem(fig, img){
-    const ROW_UNIT = 4;   // must match grid-auto-rows in the CSS
-    const V_GAP = 10;     // vertical space between tiles
-    const ratio = img.naturalWidth / img.naturalHeight;
-    fig.classList.remove('span2', 'wide-fig');
-    if(ratio > 2.2) fig.classList.add('wide-fig');
-    else if(ratio > 1.35) fig.classList.add('span2');
-    const h = img.getBoundingClientRect().height; // measured after the width class is applied
-    fig.style.gridRowEnd = 'span ' + Math.ceil((h + V_GAP) / ROW_UNIT);
-    fig.classList.add('ready');
-  }
 
   // ---- fullscreen image viewer: click any gallery photo to open it full screen ----
   const fsViewer = document.getElementById('fsViewer');
