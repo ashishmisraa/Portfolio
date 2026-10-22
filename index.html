@@ -27,7 +27,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312163a'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-weight='800' font-size='26' fill='white' text-anchor='middle'%3EAM%3C/text%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:wght@500;600&family=Allura&display=swap" rel="stylesheet">
 
 <!-- Simple analytics (optional): replace G-X06JSPH5Y2 with your real Google
      Analytics Measurement ID to start tracking visits. If you don't want
@@ -183,64 +183,52 @@
   .proj-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
   .proj-card{ border-radius:18px; overflow:hidden; background:var(--card); box-shadow:var(--shadow); }
 
-  /* ---------- inline scrollable design gallery: bold headers + horizontal swipe / scroll strips ---------- */
-  .gallery-category{ margin-bottom:52px; }
-  .gallery-category:last-child{ margin-bottom:0; }
-  .gallery-category .cat-head{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
-  .gallery-category .cat-tag{
-    font-size:11px; font-weight:800; letter-spacing:1.5px; color:#fff;
-    padding:5px 13px; border-radius:20px; white-space:nowrap;
+  /* ---------- design gallery: "mosaic" collage with filter tabs ---------- */
+  .gal-section{ position:relative; overflow:hidden; }
+  .gal-head{ text-align:center; margin-bottom:26px; }
+  .gal-script{ display:block; font-family:'Allura',cursive; font-size:44px; line-height:1; color:#e02626; margin-bottom:-6px; }
+  .gal-title{
+    font-family:'Playfair Display',serif; font-weight:500; font-size:46px;
+    letter-spacing:2px; margin:0; color:var(--navy); text-transform:uppercase;
   }
-  .gallery-category h3{ font-size:27px; font-weight:800; margin:0; color:var(--navy); }
-  .gallery-category .cat-desc{ font-size:14px; color:var(--muted); margin:6px 0 16px; }
+  .gal-filters{ display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin:0 0 34px; position:relative; z-index:2; }
+  .gal-filter{
+    font-family:'Poppins',sans-serif; font-size:11px; font-weight:600; letter-spacing:.5px; text-transform:uppercase;
+    padding:10px 18px; border-radius:8px; cursor:pointer;
+    background:#fff; color:var(--navy); border:1px solid #d9dcef;
+    box-shadow:0 3px 8px rgba(18,22,58,.08); transition:background .2s ease, color .2s ease, transform .2s ease;
+  }
+  .gal-filter:hover{ transform:translateY(-2px); }
+  .gal-filter.active{ background:#e02626; color:#fff; border-color:#e02626; }
+  .gal-filter[hidden]{ display:none; }
 
-  /* Swipe / scroll gallery: each category is one horizontal strip. Every image keeps its
-     natural proportions (fixed height, width follows the photo), so there are no gaps and
-     the page stays short. Swipe on phones, drag / scroll / use the arrows on desktop. */
-  .gallery-wrap{ position:relative; }
-  .gallery-grid{
-    display:flex; gap:10px;
-    height:auto;
-    overflow-x:auto; overflow-y:hidden;
-    scroll-snap-type:x proximity;
-    -webkit-overflow-scrolling:touch;
-    overscroll-behavior-x:contain;
-    scrollbar-width:thin;
-    padding-bottom:10px;
-    cursor:grab;
+  /* every photo keeps its natural proportions; JS gives each one a different size so the
+     whole set reads as a loose, scattered mosaic. All images are visible on the page. */
+  .mosaic{
+    display:flex; flex-wrap:wrap; justify-content:center; align-items:center;
+    gap:16px 16px; position:relative; z-index:1; padding:6px 0 10px;
   }
-  .gallery-grid.dragging{ cursor:grabbing; scroll-snap-type:none; }
-  .gallery-grid figure{
-    flex:0 0 auto; margin:0; height:260px;
-    scroll-snap-align:start;
-    min-width:160px; background:#f4f5f8; border-radius:10px;
-  }
-  .gallery-grid img{
-    display:block; height:100%; width:auto;
-    border-radius:10px;
-    cursor:pointer; transition:opacity .2s ease;
+  .mosaic figure{ margin:0; flex:0 0 auto; width:150px; transition:transform .25s ease; }
+  .mosaic figure:nth-child(3n+1){ margin-top:14px; }
+  .mosaic figure:nth-child(3n+2){ margin-bottom:12px; }
+  .mosaic figure[hidden]{ display:none; }
+  .mosaic figure:hover{ transform:scale(1.03); }
+  .mosaic img{
+    display:block; width:100%; height:auto; cursor:pointer;
+    box-shadow:0 8px 22px rgba(18,22,58,.14); border-radius:2px;
     user-select:none; -webkit-user-drag:none;
   }
-  .gallery-grid img:hover{ opacity:0.9; }
-  .gallery-grid::-webkit-scrollbar{ height:6px; }
-  .gallery-grid::-webkit-scrollbar-thumb{ background:#c9cdea; border-radius:6px; }
-
-  .gal-arrow{
-    position:absolute; top:calc(50% - 5px); transform:translateY(-50%); z-index:3;
-    width:42px; height:42px; border-radius:50%; border:none;
-    background:rgba(18,22,58,.78); color:#fff; font-size:22px; line-height:1;
-    cursor:pointer; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 16px rgba(18,22,58,.25);
-    transition:opacity .2s ease, background .2s ease;
-  }
-  .gal-arrow:hover{ background:var(--navy); }
-  .gal-arrow.prev{ left:8px; }
-  .gal-arrow.next{ right:8px; }
-  .gal-arrow[hidden]{ display:none; }
-  @media (hover:none){ .gal-arrow{ display:none; } } /* touch screens just swipe */
+  .gal-dot{ position:absolute; border-radius:50%; background:#e02626; z-index:0; pointer-events:none; }
+  .gal-dot.d1{ width:34px; height:34px; top:230px; left:6%; }
+  .gal-dot.d2{ width:22px; height:22px; top:58%; left:46%; }
+  .gal-dot.d3{ width:12px; height:12px; top:66%; left:44%; }
+  .gal-dot.d4{ width:26px; height:26px; bottom:90px; right:7%; }
   @media (max-width:600px){
-    .gallery-grid figure{ height:190px; min-width:120px; }
-    .gallery-category h3{ font-size:22px; }
+    .gal-script{ font-size:34px; }
+    .gal-title{ font-size:28px; letter-spacing:1px; }
+    .gal-filter{ padding:8px 12px; font-size:10px; }
+    .mosaic{ gap:10px; }
+    .gal-dot{ display:none; }
   }
 
   /* ---------- fullscreen image viewer ---------- */
@@ -633,14 +621,15 @@
 </section>
 
 <!-- ================= RECENT DESIGNS ================= -->
-<section class="projects" id="designs">
+<section class="projects gal-section" id="designs">
+  <span class="gal-dot d1"></span><span class="gal-dot d2"></span><span class="gal-dot d3"></span><span class="gal-dot d4"></span>
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow-tag">◆ PORTFOLIO</span>
-      <h2>Design</h2>
-      <p>A collection of my work — scroll down to see everything.</p>
+    <div class="gal-head reveal">
+      <span class="gal-script">Portfolio</span>
+      <h2 class="gal-title">Design Gallery</h2>
     </div>
-    <div id="designGalleries"></div>
+    <div class="gal-filters" id="galFilters"></div>
+    <div class="mosaic" id="designGalleries"></div>
   </div>
 </section>
 
@@ -847,7 +836,7 @@
         "images/designs/15.jpg",
         "images/designs/16.jpg",
         "images/designs/17.jpg",
-         "images/designs/18.jpg",
+        "images/designs/18.jpg",
         "images/designs/19.jpg",
         "images/designs/20.jpg",
         "images/designs/21.jpg",
@@ -859,7 +848,28 @@
         "images/designs/27.jpg",
         "images/designs/28.jpg",
         "images/designs/29.jpg",
-        "images/designs/30.jpg"
+        "images/designs/30.jpg",
+        "images/designs/31.jpg",
+        "images/designs/32.jpg",
+        "images/designs/33.jpg",
+        "images/designs/34.jpg",
+        "images/designs/35.jpg",
+        "images/designs/36.jpg",
+        "images/designs/37.jpg",
+        "images/designs/38.jpg",
+        "images/designs/39.jpg",
+        "images/designs/40.jpg",
+        "images/designs/41.jpg",
+        "images/designs/42.jpg",
+        "images/designs/43.jpg",
+        "images/designs/44.jpg",
+        "images/designs/45.jpg",
+        "images/designs/46.jpg",
+        "images/designs/47.jpg",
+        "images/designs/48.jpg",
+        "images/designs/49.jpg",
+        "images/designs/50.jpg",
+        "images/designs/51.jpg"
       ]
     },
     uiux: {
@@ -877,22 +887,101 @@
         "images/UI-UX/9.png",
         "images/UI-UX/10.png",
         "images/UI-UX/11.png",
-        "images/UI-UX/12.png"
+        "images/UI-UX/12.png",
+        "images/UI-UX/13.png",
+        "images/UI-UX/14.png",
+        "images/UI-UX/15.png",
+        "images/UI-UX/16.png",
+        "images/UI-UX/17.png",
+        "images/UI-UX/18.png",
+        "images/UI-UX/19.png",
+        "images/UI-UX/20.png",
+        "images/UI-UX/21.png",
+        "images/UI-UX/22.png",
+        "images/UI-UX/23.png",
+        "images/UI-UX/24.png",
+        "images/UI-UX/25.png",
+        "images/UI-UX/26.png",
+        "images/UI-UX/27.png",
+        "images/UI-UX/28.png",
+        "images/UI-UX/29.png",
+        "images/UI-UX/30.png",
+        "images/UI-UX/31.png",
+        "images/UI-UX/32.png",
+        "images/UI-UX/33.png",
+        "images/UI-UX/34.png",
+        "images/UI-UX/35.png",
+        "images/UI-UX/36.png",
+        "images/UI-UX/37.png",
+        "images/UI-UX/38.png",
+        "images/UI-UX/39.png",
+        "images/UI-UX/40.png",
+        "images/UI-UX/41.png",
+        "images/UI-UX/42.png",
+        "images/UI-UX/43.png",
+        "images/UI-UX/44.png",
+        "images/UI-UX/45.png",
+        "images/UI-UX/46.png",
+        "images/UI-UX/47.png",
+        "images/UI-UX/48.png",
+        "images/UI-UX/49.png",
+        "images/UI-UX/50.png"
       ]
     },
     photography: {
       title: "Photography & Retouch",
       desc: "A look at my photography process -- from raw capture to final retouch.",
       images: [
-      "images/photography/1.jpg",
-      "images/photography/2.jpg",
-      "images/photography/3.jpg",
-      "images/photography/4.jpg",
-      "images/photography/5.jpg",
-      "images/photography/6.jpg",
-      "images/photography/7.jpg",
-      "images/photography/8.jpg",
-      "images/photography/9.jpg"
+        "images/photography/1.jpg",
+        "images/photography/2.jpg",
+        "images/photography/3.jpg",
+        "images/photography/4.jpg",
+        "images/photography/5.jpg",
+        "images/photography/6.jpg",
+        "images/photography/7.jpg",
+        "images/photography/8.jpg",
+        "images/photography/9.jpg",
+        "images/photography/10.jpg",
+        "images/photography/11.jpg",
+        "images/photography/12.jpg",
+        "images/photography/13.jpg",
+        "images/photography/14.jpg",
+        "images/photography/15.jpg",
+        "images/photography/16.jpg",
+        "images/photography/17.jpg",
+        "images/photography/18.jpg",
+        "images/photography/19.jpg",
+        "images/photography/20.jpg",
+        "images/photography/21.jpg",
+        "images/photography/22.jpg",
+        "images/photography/23.jpg",
+        "images/photography/24.jpg",
+        "images/photography/25.jpg",
+        "images/photography/26.jpg",
+        "images/photography/27.jpg",
+        "images/photography/28.jpg",
+        "images/photography/29.jpg",
+        "images/photography/30.jpg",
+        "images/photography/31.jpg",
+        "images/photography/32.jpg",
+        "images/photography/33.jpg",
+        "images/photography/34.jpg",
+        "images/photography/35.jpg",
+        "images/photography/36.jpg",
+        "images/photography/37.jpg",
+        "images/photography/38.jpg",
+        "images/photography/39.jpg",
+        "images/photography/40.jpg",
+        "images/photography/41.jpg",
+        "images/photography/42.jpg",
+        "images/photography/43.jpg",
+        "images/photography/44.jpg",
+        "images/photography/45.jpg",
+        "images/photography/46.jpg",
+        "images/photography/47.jpg",
+        "images/photography/48.jpg",
+        "images/photography/49.jpg",
+        "images/photography/50.jpg"
       ]
     },
     beforeafter: {
@@ -900,7 +989,6 @@
       desc: "Side-by-side before and after photo edits.",
       images: [
         "images/before-after/1.jpg",
-        "images/before-after/2.jpg",
         "images/before-after/2.jpg",
         "images/before-after/3.jpg",
         "images/before-after/4.jpg",
@@ -913,7 +1001,43 @@
         "images/before-after/11.jpg",
         "images/before-after/12.jpg",
         "images/before-after/13.jpg",
-        "images/before-after/14.jpg"
+        "images/before-after/14.jpg",
+        "images/before-after/15.jpg",
+        "images/before-after/16.jpg",
+        "images/before-after/17.jpg",
+        "images/before-after/18.jpg",
+        "images/before-after/19.jpg",
+        "images/before-after/20.jpg",
+        "images/before-after/21.jpg",
+        "images/before-after/22.jpg",
+        "images/before-after/23.jpg",
+        "images/before-after/24.jpg",
+        "images/before-after/25.jpg",
+        "images/before-after/26.jpg",
+        "images/before-after/27.jpg",
+        "images/before-after/28.jpg",
+        "images/before-after/29.jpg",
+        "images/before-after/30.jpg",
+        "images/before-after/31.jpg",
+        "images/before-after/32.jpg",
+        "images/before-after/33.jpg",
+        "images/before-after/34.jpg",
+        "images/before-after/35.jpg",
+        "images/before-after/36.jpg",
+        "images/before-after/37.jpg",
+        "images/before-after/38.jpg",
+        "images/before-after/39.jpg",
+        "images/before-after/40.jpg",
+        "images/before-after/41.jpg",
+        "images/before-after/42.jpg",
+        "images/before-after/43.jpg",
+        "images/before-after/44.jpg",
+        "images/before-after/45.jpg",
+        "images/before-after/46.jpg",
+        "images/before-after/47.jpg",
+        "images/before-after/48.jpg",
+        "images/before-after/49.jpg",
+        "images/before-after/50.jpg"
       ]
       ,
       captions: [
@@ -926,111 +1050,95 @@
     }
   };
 
-  // ---- build the inline, scrollable design gallery (no tabs, no popup) ----
-  // Loops through each category in galleryData and renders it directly on the
-  // page as a heading + a grid of images. Nothing here needs to be clicked open.
-  (function buildInlineGalleries(){
+  // ---- mosaic design gallery: every image visible, filter tabs on top ----
+  // Each category has room for 50 photos. Photos are checked in small batches; one that
+  // doesn't exist yet is simply skipped (no gap, no broken icon), and a category stops
+  // being checked once a whole batch comes back empty.
+  (function buildMosaicGallery(){
     const container = document.getElementById('designGalleries');
-    const tagColors = { designs:'#1c2d55', uiux:'#ee2a6f', photography:'#4f7df3', beforeafter:'#f4b400' };
-    const tagLabels = { designs:'DESIGN', uiux:'UI/UX', photography:'PHOTO', beforeafter:'EDITS' };
-    Object.keys(galleryData).forEach(key=>{
+    const filters = document.getElementById('galFilters');
+    const items = [];                       // loaded photos: { fig, img, key, index }
+    const BATCH = 6;
+    // different visual "weights" so neighbours come out in different sizes
+    const AREAS = [92000, 50000, 30000, 68000, 40000, 112000, 34000, 60000];
+
+    function sizeFor(img, index){
+      const cw = container.clientWidth || 1100;
+      const s = Math.max(0.36, Math.min(1.15, cw / 1100));      // scale with screen width
+      const ratio = (img.naturalWidth / img.naturalHeight) || 1;
+      const w = Math.sqrt(AREAS[index % AREAS.length] * ratio) * s;
+      return Math.round(Math.max(70 * Math.max(s, .8), Math.min(w, cw * 0.62)));
+    }
+    function layoutItem(it){
+      it.fig.style.width = sizeFor(it.img, it.index) + 'px';
+    }
+
+    // filter tabs: ALL + one per category
+    function addPill(label, filter){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'gal-filter' + (filter === 'all' ? ' active' : '');
+      b.dataset.filter = filter;
+      b.textContent = label;
+      b.addEventListener('click', ()=>{
+        filters.querySelectorAll('.gal-filter').forEach(x=> x.classList.toggle('active', x === b));
+        items.forEach(it=>{ it.fig.hidden = !(filter === 'all' || it.key === filter); });
+      });
+      filters.appendChild(b);
+      return b;
+    }
+    addPill('All', 'all');
+
+    Object.keys(galleryData).forEach((key, catIndex)=>{
       const data = galleryData[key];
-      const section = document.createElement('div');
-      section.className = 'gallery-category';
+      const pill = addPill(data.title, key);
+      pill.hidden = true;                   // shown as soon as this category has one real photo
+      const total = data.images.length;
 
-      const head = document.createElement('div');
-      head.className = 'cat-head';
-      const tag = document.createElement('span');
-      tag.className = 'cat-tag';
-      tag.textContent = tagLabels[key] || '';
-      tag.style.background = tagColors[key] || 'var(--navy)';
-      head.appendChild(tag);
-      const h3 = document.createElement('h3');
-      h3.textContent = data.title;
-      head.appendChild(h3);
-      section.appendChild(head);
-
-      const desc = document.createElement('p');
-      desc.className = 'cat-desc';
-      desc.textContent = data.desc;
-      section.appendChild(desc);
-
-      const wrap = document.createElement('div');
-      wrap.className = 'gallery-wrap';
-      const grid = document.createElement('div');
-      grid.className = 'gallery-grid';
-
-      const prevBtn = document.createElement('button');
-      prevBtn.type = 'button'; prevBtn.className = 'gal-arrow prev';
-      prevBtn.setAttribute('aria-label', 'Scroll left'); prevBtn.innerHTML = '&#8249;';
-      const nextBtn = document.createElement('button');
-      nextBtn.type = 'button'; nextBtn.className = 'gal-arrow next';
-      nextBtn.setAttribute('aria-label', 'Scroll right'); nextBtn.innerHTML = '&#8250;';
-
-      // show / hide the arrows depending on whether there is more to scroll to
-      function updateArrows(){
-        const max = grid.scrollWidth - grid.clientWidth;
-        prevBtn.hidden = grid.scrollLeft <= 4;
-        nextBtn.hidden = max <= 4 || grid.scrollLeft >= max - 4;
+      function loadImage(i){
+        return new Promise(resolve=>{
+          const img = new Image();
+          img.decoding = 'async';
+          img.draggable = false;
+          img.alt = data.title + ' photo ' + (i + 1);
+          img.onload = ()=>{
+            const fig = document.createElement('figure');
+            fig.dataset.cat = key;
+            fig.style.order = catIndex * 1000 + i;      // keeps photos in their numbered order
+            const it = { fig, img, key, index: catIndex * 3 + i };
+            const captionText = (data.captions && data.captions[i]) ? data.captions[i] : '';
+            img.addEventListener('click', ()=> openFullscreen(img.src, img.alt, captionText));
+            fig.appendChild(img);
+            const activeBtn = filters.querySelector('.gal-filter.active');
+            const f = activeBtn ? activeBtn.dataset.filter : 'all';
+            fig.hidden = !(f === 'all' || f === key);
+            container.appendChild(fig);
+            items.push(it);
+            layoutItem(it);
+            pill.hidden = false;
+            resolve(true);
+          };
+          img.onerror = ()=> resolve(false);             // not uploaded yet -> skip it
+          img.src = data.images[i];
+        });
       }
-      prevBtn.addEventListener('click', ()=> grid.scrollBy({ left: -grid.clientWidth * 0.85, behavior: 'smooth' }));
-      nextBtn.addEventListener('click', ()=> grid.scrollBy({ left:  grid.clientWidth * 0.85, behavior: 'smooth' }));
-      grid.addEventListener('scroll', updateArrows, { passive: true });
-      window.addEventListener('resize', updateArrows);
 
-      // desktop: click-and-drag the strip sideways (touch screens use native swipe)
-      let isDown = false, startX = 0, startScroll = 0, moved = false;
-      grid.addEventListener('pointerdown', (e)=>{
-        if(e.pointerType !== 'mouse' || e.button !== 0) return;
-        isDown = true; moved = false;
-        startX = e.clientX; startScroll = grid.scrollLeft;
-      });
-      window.addEventListener('pointermove', (e)=>{
-        if(!isDown) return;
-        const dx = e.clientX - startX;
-        if(Math.abs(dx) > 5){ moved = true; grid.classList.add('dragging'); }
-        if(moved) grid.scrollLeft = startScroll - dx;
-      });
-      window.addEventListener('pointerup', ()=>{
-        if(!isDown) return;
-        isDown = false;
-        grid.classList.remove('dragging');
-        setTimeout(()=>{ moved = false; }, 0); // lets the click handler see "moved" first
-      });
-
-      data.images.forEach((src, i)=>{
-        const fig = document.createElement('figure');
-        const img = document.createElement('img');
-        img.src = (src.indexOf('PASTE_') === 0) ? PLACEHOLDER_IMG : src;
-        img.alt = data.title + ' photo ' + (i + 1);
-        img.loading = 'lazy';
-        img.draggable = false;
-        // if the file doesn't actually exist yet (404), remove it silently
-        // instead of showing a broken-image box
-        img.addEventListener('error', ()=>{
-          fig.remove();
-          if(grid.children.length === 0){
-            section.remove(); // no real images loaded for this category at all
-          } else {
-            updateArrows();
-          }
+      function loadBatch(start){
+        if(start >= total) return;
+        const jobs = [];
+        for(let i = start; i < Math.min(start + BATCH, total); i++) jobs.push(loadImage(i));
+        Promise.all(jobs).then(results=>{
+          if(results.some(Boolean)) loadBatch(start + BATCH);   // found something -> keep going
         });
-        img.addEventListener('load', updateArrows);
-        fig.appendChild(img);
-        const captionText = (data.captions && data.captions[i]) ? data.captions[i] : '';
-        img.addEventListener('click', ()=>{
-          if(moved) return; // it was a drag, not a click
-          openFullscreen(img.src, img.alt, captionText);
-        });
-        grid.appendChild(fig);
-      });
+      }
+      loadBatch(0);
+    });
 
-      wrap.appendChild(prevBtn);
-      wrap.appendChild(grid);
-      wrap.appendChild(nextBtn);
-      section.appendChild(wrap);
-      container.appendChild(section);
-      updateArrows();
+    // re-size everything when the window changes size
+    let t;
+    window.addEventListener('resize', ()=>{
+      clearTimeout(t);
+      t = setTimeout(()=> items.forEach(layoutItem), 150);
     });
   })();
 
