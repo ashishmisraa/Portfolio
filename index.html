@@ -26,6 +26,7 @@
 <!-- Favicon: dark navy square with "AM" initials, built as an inline SVG (no separate file needed) -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312163a'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-weight='800' font-size='26' fill='white' text-anchor='middle'%3EAM%3C/text%3E%3C/svg%3E">
 
+<link rel="preload" as="image" href="images/headshot.png" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:wght@500;600&family=Allura&display=swap" rel="stylesheet">
 
@@ -475,7 +476,7 @@
   <img class="hero-doodle right" src="images/hero-doodle-right.png" alt="" aria-hidden="true">
   <div class="wrap grid">
     <div class="hero-art reveal show">
-      <div class="headshot"><img class="ph" src="images/headshot.png" alt="Ashish Mishra"></div>
+      <div class="headshot"><img class="ph" src="images/headshot.png" alt="Ashish Mishra" width="800" height="855" fetchpriority="high" decoding="async"></div>
       <div class="role-label">Graphic Designer<span class="arrow">&#8595;</span></div>
     </div>
     <div class="hero-text reveal show">
@@ -495,7 +496,7 @@
 <!-- ================= ABOUT ================= -->
 <section class="about" id="about">
   <div class="wrap grid">
-    <div class="about-photo reveal"><img class="ph" src="images/Headshot2.png" alt="Ashish Mishra"></div>
+    <div class="about-photo reveal"><img class="ph" src="images/Headshot2.png" alt="Ashish Mishra" width="700" height="908" loading="lazy" decoding="async"></div>
     <div class="about-text reveal">
       <span class="eyebrow-tag">◆ ABOUT ME</span>
       <h2>Hello, I'm Ashish Mishra</h2>
@@ -780,14 +781,19 @@
   }, { threshold:0.15 });
   revealEls.forEach(el=>reveal.observe(el));
 
-  // ---- hide the page loader once everything (images etc.) has loaded ----
-  window.addEventListener('load', ()=>{
+  // ---- hide the page loader once the page has loaded (or after 2.5s at most) ----
+  (function(){
     const loader = document.getElementById('pageLoader');
-    if(loader){
+    let hidden = false;
+    function hideLoader(){
+      if(hidden || !loader) return;
+      hidden = true;
       loader.classList.add('hide');
       setTimeout(()=> loader.remove(), 500);
     }
-  });
+    window.addEventListener('load', hideLoader);
+    setTimeout(hideLoader, 2500);
+  })();
 
   // ---- resume download button ----
   document.getElementById('resumeDownload').href = "Ashish-Mishra-Resume.pdf";
@@ -1058,7 +1064,8 @@
     const container = document.getElementById('designGalleries');
     const filters = document.getElementById('galFilters');
     const items = [];                       // loaded photos: { fig, img, key, index }
-    const BATCH = 6;
+    const BATCH = 4;
+    const starters = [];                    // one starter per category, run when the section is near
     // different visual "weights" so neighbours come out in different sizes
     const AREAS = [92000, 50000, 30000, 68000, 40000, 112000, 34000, 60000];
 
@@ -1131,8 +1138,22 @@
           if(results.some(Boolean)) loadBatch(start + BATCH);   // found something -> keep going
         });
       }
-      loadBatch(0);
+      starters.push(()=> loadBatch(0));
     });
+
+    // don't download any gallery photos until the visitor is close to this section,
+    // so the top of the page loads fast
+    let started = false;
+    function startAll(){ if(started) return; started = true; starters.forEach(fn=> fn()); }
+    const gallerySection = document.getElementById('designs');
+    if('IntersectionObserver' in window){
+      const io = new IntersectionObserver((entries)=>{
+        if(entries.some(en=> en.isIntersecting)){ startAll(); io.disconnect(); }
+      }, { rootMargin: '900px 0px' });
+      io.observe(gallerySection);
+    } else {
+      window.addEventListener('load', startAll);
+    }
 
     // re-size everything when the window changes size
     let t;
