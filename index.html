@@ -372,12 +372,56 @@
     transition:opacity .4s ease;
   }
   #pageLoader.hide{ opacity:0; pointer-events:none; }
-  #pageLoader .spinner{
-    width:44px; height:44px; border-radius:50%;
-    border:4px solid #d7dbf0; border-top-color:var(--blue);
-    animation:spin .8s linear infinite;
+  /* pen-tool writing animation shown while the page loads */
+  .pl-write{ position:relative; display:inline-block; padding:0 14px 34px; }
+  .pl-text{
+    display:block; font-family:'Allura','Brush Script MT','Segoe Script',cursive;
+    font-size:64px; line-height:1.15; color:var(--navy); white-space:nowrap;
+    clip-path:inset(0 100% 0 0);
+    animation:plReveal 2.6s linear infinite;
   }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .pl-line{ position:absolute; left:14px; right:14px; bottom:10px; height:16px; width:calc(100% - 28px); overflow:visible; }
+  .pl-line path{
+    fill:none; stroke:url(#plLineGrad); stroke-width:3.2; stroke-linecap:round;
+    stroke-dasharray:320; stroke-dashoffset:320;
+    animation:plLine 2.6s linear infinite;
+  }
+  .pl-pen{
+    position:absolute; left:0; bottom:20px; width:40px; height:40px; margin-left:3px;
+    animation:plPen 2.6s linear infinite; pointer-events:none;
+  }
+  .pl-pen svg{ display:block; width:100%; height:100%; transform-origin:8% 92%; animation:plWobble .24s ease-in-out infinite alternate; }
+  @keyframes plReveal{
+    0%{ clip-path:inset(0 100% 0 0); opacity:1; }
+    50%,90%{ clip-path:inset(0 0 0 0); opacity:1; }
+    97%{ clip-path:inset(0 0 0 0); opacity:0; }
+    100%{ clip-path:inset(0 100% 0 0); opacity:0; }
+  }
+  @keyframes plPen{
+    0%{ left:14px; bottom:22px; opacity:1; }
+    50%{ left:calc(100% - 14px); bottom:22px; opacity:1; }
+    54%{ left:calc(100% - 14px); bottom:6px; opacity:1; }
+    72%{ left:14px; bottom:6px; opacity:1; }
+    88%{ left:14px; bottom:6px; opacity:1; }
+    94%{ left:14px; bottom:6px; opacity:0; }
+    100%{ left:14px; bottom:22px; opacity:0; }
+  }
+  @keyframes plLine{
+    0%,53%{ stroke-dashoffset:320; opacity:1; }
+    72%,90%{ stroke-dashoffset:0; opacity:1; }
+    97%{ stroke-dashoffset:0; opacity:0; }
+    100%{ stroke-dashoffset:320; opacity:0; }
+  }
+  @keyframes plWobble{
+    from{ transform:translateY(0) rotate(0deg); }
+    to{ transform:translateY(-3px) rotate(-3deg); }
+  }
+  @media (max-width:520px){ .pl-text{ font-size:46px; } .pl-pen{ width:32px; height:32px; } }
+  @media (prefers-reduced-motion: reduce){
+    .pl-text{ animation:none; clip-path:none; }
+    .pl-line path{ animation:none; stroke-dashoffset:0; }
+    .pl-pen{ display:none; }
+  }
 
   /* ---------- responsive ---------- */
   @media (max-width:900px){
@@ -451,7 +495,30 @@
 <body>
 
 
-<div id="pageLoader"><div class="spinner"></div></div>
+<div id="pageLoader" aria-label="Loading">
+  <div class="pl-write">
+    <span class="pl-text">Ashish Mishra</span>
+    <svg class="pl-line" viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="plLineGrad" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0" stop-color="#ff6f9c"/><stop offset="1" stop-color="#4f7df3"/>
+        </linearGradient>
+      </defs>
+      <path pathLength="320" d="M298 9 C 230 2, 170 15, 110 7 S 30 4 2 9"/>
+    </svg>
+    <span class="pl-pen" aria-hidden="true">
+      <svg viewBox="0 0 40 40">
+        <defs>
+          <linearGradient id="plPenGrad" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#ff6f9c"/><stop offset="1" stop-color="#4f7df3"/>
+          </linearGradient>
+        </defs>
+        <line x1="13" y1="27" x2="33" y2="7" stroke="url(#plPenGrad)" stroke-width="8" stroke-linecap="round"/>
+        <polygon points="3,37 8,22 18,32" fill="#12163a"/>
+      </svg>
+    </span>
+  </div>
+</div>
 
 <header>
   <div class="wrap">
@@ -781,18 +848,25 @@
   }, { threshold:0.15 });
   revealEls.forEach(el=>reveal.observe(el));
 
-  // ---- hide the page loader once the page has loaded (or after 2.5s at most) ----
+  // ---- hide the page loader: after the page has loaded AND the pen has had time to
+  //      finish writing (about 1.9s). Never waits more than 3.5s in total. ----
   (function(){
     const loader = document.getElementById('pageLoader');
-    let hidden = false;
+    const MIN_SHOW = 1900;
+    const started = performance.now();
+    let hidden = false, loaded = document.readyState === 'complete';
     function hideLoader(){
       if(hidden || !loader) return;
       hidden = true;
       loader.classList.add('hide');
       setTimeout(()=> loader.remove(), 500);
     }
-    window.addEventListener('load', hideLoader);
-    setTimeout(hideLoader, 2500);
+    function tryHide(){
+      const wait = Math.max(0, MIN_SHOW - (performance.now() - started));
+      setTimeout(hideLoader, wait);
+    }
+    if(loaded) tryHide(); else window.addEventListener('load', tryHide);
+    setTimeout(hideLoader, 3500);
   })();
 
   // ---- resume download button ----
