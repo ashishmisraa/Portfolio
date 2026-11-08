@@ -3,10 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ashish Mishra — Portfolio</title>
+<title>Ashish Mishra — Graphic Designer in Thane | Portfolio</title>
+
+<!-- Tells Google which address is the "official" one for this page -->
+<link rel="canonical" href="https://ashishmisraa.github.io/Portfolio/">
+
+<!-- Google Search Console ownership check (optional): after adding your site there,
+     choose the "HTML tag" method, then replace the line below with the tag it gives you. -->
+<!-- <meta name="google-site-verification" content="PASTE-YOUR-CODE-HERE"> -->
 
 <!-- Page description (shows in Google search results) -->
-<meta name="description" content="Ashish Mishra — Graphic Designer with 5 years of experience in visual design, UI/UX and AI-powered creative workflows, based in Thane, India.">
+<meta name="description" content="Ashish Mishra — Graphic Designer in Thane, India with 5 years of experience in visual design, logos, banners, typography and brand-guideline artwork for OTT and TV platforms.">
 
 <!-- Preview card when this page is shared on LinkedIn, WhatsApp, etc. -->
 <!-- IMPORTANT: replace YOUR-USERNAME and YOUR-REPO below with your real GitHub
@@ -14,14 +21,17 @@
      image to images/preview.jpg in your repo. Until then, most platforms will
      just show the page with no image. -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Ashish Mishra — Portfolio">
-<meta property="og:description" content="Graphic Designer with 5 years of experience across visual design, UI/UX and AI-powered creative workflows.">
-<meta property="og:image" content="https://ashishmisraa.github.io/Portfolio/images/headshot.png">
+<meta property="og:title" content="Ashish Mishra — Graphic Designer in Thane">
+<meta property="og:description" content="Graphic Designer in Thane, India — 5 years of visual design, logos, banners and typography for OTT and TV platforms.">
+<meta property="og:image" content="https://ashishmisraa.github.io/Portfolio/images/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ashish Mishra — Graphic Designer in Thane, India">
 <meta property="og:url" content="https://ashishmisraa.github.io/Portfolio/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ashish Mishra — Portfolio">
-<meta name="twitter:description" content="Graphic Designer — visual design, UI/UX and AI-powered creative workflows.">
-<meta name="twitter:image" content="https://ashishmisraa.github.io/Portfolio/images/headshot.png">
+<meta name="twitter:title" content="Ashish Mishra — Graphic Designer in Thane">
+<meta name="twitter:description" content="Graphic Designer in Thane, India — visual design, logos, banners and typography.">
+<meta name="twitter:image" content="https://ashishmisraa.github.io/Portfolio/images/preview.jpg">
 
 <!-- Favicon: dark navy square with "AM" initials, built as an inline SVG (no separate file needed) -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312163a'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-weight='800' font-size='26' fill='white' text-anchor='middle'%3EAM%3C/text%3E%3C/svg%3E">
@@ -106,10 +116,11 @@
   .hero h1.sub{ color:#b9bfe0; position:relative; z-index:1; }
   .hero-text{ order:1; position:relative; padding-top:100px; }
   .hero-art{ order:2; }
-  .hero h1:not(.sub){
+  .hero .hero-ghost{
     position:absolute; top:-30px; left:-4px; right:0;
-    font-size:120px; color:#dde1f7; z-index:0;
-    white-space:nowrap; overflow:hidden; pointer-events:none;
+    font-size:120px; font-weight:800; line-height:1.08; margin:0 0 4px;
+    color:#dde1f7; z-index:0;
+    white-space:nowrap; overflow:hidden; pointer-events:none; user-select:none;
   }
   .hero .eyebrow-tag, .hero p.lead, .hero .cta-row{ position:relative; z-index:1; }
   .hero p.lead{ font-size:16px; color:var(--muted); line-height:1.7; max-width:480px; margin:20px 0 30px; }
@@ -430,7 +441,7 @@
     .hero .grid{ display:block; }
     .hero-text{ padding-top:44px; }
     .hero h1.sub{ font-size:36px; }
-    .hero h1:not(.sub){ font-size:52px; top:-12px; }
+    .hero .hero-ghost{ font-size:52px; top:-12px; }
     .hero-art{
       float:right; width:50%; max-width:220px; aspect-ratio:auto;
       margin:44px 0 16px 16px;
@@ -471,7 +482,7 @@
   "@context": "https://schema.org",
   "@type": "Person",
   "name": "Ashish Mishra",
-  "jobTitle": ["Graphic Designer", "UI/UX Designer"],
+  "jobTitle": "Graphic Designer",
   "url": "https://ashishmisraa.github.io/Portfolio/",
   "image": "https://ashishmisraa.github.io/Portfolio/images/headshot.png",
   "email": "mailto:ashish5111996@gmail.com",
@@ -481,7 +492,8 @@
     "addressLocality": "Thane",
     "addressCountry": "IN"
   },
-  "description": "Creative Visual Designer with experience across graphic design, brand communication, UI/UX and video editing.",
+  "description": "Graphic Designer in Thane, India with 5 years of experience in visual design, logos, banners, typography and brand-guideline artwork.",
+  "knowsAbout": ["Graphic Design", "Logo Design", "Typography", "Image Retouching", "Brand Guidelines", "Adobe Photoshop", "Adobe Illustrator", "Adobe InDesign"],
   "sameAs": [
     "https://www.facebook.com/aashishmisraa",
     "https://www.instagram.com/chhichhoraa/",
@@ -548,7 +560,7 @@
     </div>
     <div class="hero-text reveal show">
       <span class="eyebrow-tag">PORTFOLIO</span>
-      <h1>Creative</h1>
+      <div class="hero-ghost" aria-hidden="true">Creative</div>
       <h1 class="sub">Graphic Designer.</h1>
       <p class="lead">I'm Ashish Mishra — a graphic designer and UI/UX-focused visual designer who turns concepts into visually stunning experiences, blending pixels and imagination into meaningful stories.</p>
       <div class="cta-row">
